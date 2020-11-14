@@ -29,6 +29,12 @@
             "main": "packages/core/src/index.ts",
             "assets": ["packages/core/*.md"]
           }
+        },
+        "version": {
+          "builder": "./tools/src/builders/npm-version:npm-version"
+        },
+        "deploy": {
+          "builder": "./tools/src/builders/npm-publish:npm-publish"
         }
       }
     }

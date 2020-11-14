@@ -25,11 +25,10 @@
       {
         "enforceBuildableLibDependency": true,
         "allow": [],
-        "depConstraints": [
-          { "sourceTag": "*", "onlyDependOnLibsWithTags": ["*"] }
-        ]
+        "depConstraints": [{ "sourceTag": "*", "onlyDependOnLibsWithTags": ["*"] }]
       }
-    ]
+    ],
+    "sort-imports": ["error"]
   },
   "overrides": [
     {

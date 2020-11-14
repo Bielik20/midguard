@@ -1,0 +1,9 @@
+{
+  "builders": {
+    "npm-publish": {
+      "implementation": "./impl",
+      "schema": "./schema.json",
+      "description": "Publish packages to npm (GitHub) registry."
+    }
+  }
+}

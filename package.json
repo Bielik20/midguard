@@ -1,6 +1,6 @@
 {
   "name": "midguard",
-  "version": "0.0.0",
+  "version": "0.0.0-development",
   "license": "MIT",
   "scripts": {
     "nx": "nx",
@@ -22,29 +22,53 @@
     "format:check": "nx format:check",
     "update": "nx migrate latest",
     "workspace-schematic": "nx workspace-schematic",
+    "tools": "tsc --project tools/src/tsconfig.json",
     "dep-graph": "nx dep-graph",
-    "help": "nx help"
+    "help": "nx help",
+    "semantic-release": "semantic-release"
   },
   "private": true,
   "dependencies": {},
   "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
     "@nrwl/cli": "10.3.3",
     "@nrwl/eslint-plugin-nx": "10.3.3",
     "@nrwl/jest": "10.3.3",
     "@nrwl/node": "^10.3.3",
     "@nrwl/workspace": "10.3.3",
+    "@semantic-release/exec": "^5.0.0",
     "@types/jest": "26.0.8",
     "@types/node": "~8.9.4",
     "@typescript-eslint/eslint-plugin": "4.3.0",
     "@typescript-eslint/parser": "4.3.0",
+    "commitizen": "^4.2.2",
+    "cz-conventional-changelog": "^3.3.0",
     "dotenv": "6.2.0",
     "eslint": "7.10.0",
     "eslint-config-prettier": "6.0.0",
+    "husky": "^4.3.0",
     "jest": "26.2.2",
+    "lint-staged": "^10.5.1",
     "prettier": "2.0.4",
+    "semantic-release": "^17.2.2",
     "ts-jest": "26.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~6.0.0",
     "typescript": "~4.0.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bielik20/midguard.git"
   }
 }
