@@ -4,6 +4,7 @@ var tslib_1 = require('tslib');
 var architect_1 = require('@angular-devkit/architect');
 var rxjs_1 = require('rxjs');
 var print_builder_result_1 = require('../../utils/print-builder-result');
+var spawn_process_1 = require('../../utils/spawn-process');
 exports.default = architect_1.createBuilder(function (options, context) {
   context.logger.info('Executing "npm-publish" for ' + context.target.project);
   return rxjs_1
@@ -19,7 +20,15 @@ function npmPublishBuilder(options, context) {
           return [4, getOutputPath(context)];
         case 1:
           outputPath = _a.sent();
-          console.log(options);
+          return [
+            4,
+            spawn_process_1
+              .spawnProcess('npm', ['publish'], { cwd: outputPath })
+              .pipe(spawn_process_1.log(context))
+              .toPromise(),
+          ];
+        case 2:
+          _a.sent();
           return [
             2,
             {
