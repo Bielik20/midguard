@@ -13,21 +13,36 @@ exports.default = architect_1.createBuilder(function (options, context) {
 });
 function npmPublishBuilder(options, context) {
   return tslib_1.__awaiter(this, void 0, void 0, function () {
-    var outputPath;
+    var outputPath, npmrc;
     return tslib_1.__generator(this, function (_a) {
       switch (_a.label) {
         case 0:
           return [4, getOutputPath(context)];
         case 1:
           outputPath = _a.sent();
+          npmrc = generateNpmrc();
+          return [4, spawn_process_1.spawnProcess('rm', ['-f', '.npmrc'], { cwd: outputPath }).toPromise()];
+        case 2:
+          _a.sent();
           return [
             4,
             spawn_process_1
-              .spawnProcess('npm', ['publish'], { cwd: outputPath })
+              .spawnProcess('echo', ['"' + npmrc + '" >> .npmrc'], {
+                cwd: outputPath,
+                shell: true,
+              })
+              .toPromise(),
+          ];
+        case 3:
+          _a.sent();
+          return [
+            4,
+            spawn_process_1
+              .spawnProcess('npm', ['publish', '--access public'], { cwd: outputPath })
               .pipe(spawn_process_1.log(context))
               .toPromise(),
           ];
-        case 2:
+        case 4:
           _a.sent();
           return [
             2,
@@ -58,4 +73,7 @@ function getOutputPath(context) {
       }
     });
   });
+}
+function generateNpmrc() {
+  return '\nregistry=http://registry.npmjs.org/\n@midguard:registry=https://registry.npmjs.org/\n'.trim();
 }

@@ -11,8 +11,14 @@ export default createBuilder((options: unknown, context: BuilderContext) => {
 
 async function npmPublishBuilder(options: unknown, context: BuilderContext): Promise<BuilderOutput> {
   const outputPath = await getOutputPath(context);
+  const npmrc = generateNpmrc();
 
-  await spawnProcess('npm', ['publish'], { cwd: outputPath }).pipe(log(context)).toPromise();
+  await spawnProcess('rm', ['-f', '.npmrc'], { cwd: outputPath }).toPromise();
+  await spawnProcess('echo', [`"${npmrc}" >> .npmrc`], {
+    cwd: outputPath,
+    shell: true,
+  }).toPromise();
+  await spawnProcess('npm', ['publish', '--access public'], { cwd: outputPath }).pipe(log(context)).toPromise();
 
   return {
     success: true,
@@ -26,4 +32,11 @@ async function getOutputPath(context: BuilderContext): Promise<string> {
   });
 
   return options.outputPath as string;
+}
+
+function generateNpmrc(): string {
+  return `
+registry=http://registry.npmjs.org/
+@midguard:registry=https://registry.npmjs.org/
+`.trim();
 }
