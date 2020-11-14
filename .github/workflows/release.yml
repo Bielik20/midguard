@@ -1,4 +1,4 @@
-name: Check
+name: Release
 on:
   push:
     branches:
@@ -7,23 +7,23 @@ on:
 
 
 jobs:
-  setup:
-    name: Setup Node
+  install:
+    name: Install Dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
           node-version: 12
       - name: Cache node_modules
         uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: node_modules
+          key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -32,9 +32,9 @@ jobs:
         run: npm ci
 
 
-  release:
-    name: Release
-    needs: setup
+  lint:
+    name: Lint
+    needs: install
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,14 +46,58 @@ jobs:
         with:
           node-version: 12
       - name: Load node_modules
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
           # no restore-keys here, so we only accept this exact version
-      - name: Install dependencies
-        run: npm ci
-      - name: Release
+      - name: Execute
+        run: yarn affected:lint --parallel --base=$(git describe --tags --abbrev=0)
+
+
+  test:
+    name: Test
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Load node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          # no restore-keys here, so we only accept this exact version
+      - name: Execute
+        run: yarn affected:test --parallel --base=$(git describe --tags --abbrev=0)
+
+
+  release:
+    name: Release
+    needs: [install, lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Load node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          # no restore-keys here, so we only accept this exact version
+      - name: Execute
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
