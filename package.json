@@ -7,6 +7,7 @@
     "url": "https://github.com/Bielik20/midguard.git"
   },
   "scripts": {
+    "commit": "git-cz",
     "nx": "nx",
     "start": "nx serve",
     "build": "nx build",
