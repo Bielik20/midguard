@@ -13,14 +13,15 @@ exports.default = architect_1.createBuilder(function (options, context) {
 });
 function npmPublishBuilder(options, context) {
   return tslib_1.__awaiter(this, void 0, void 0, function () {
-    var outputPath, npmrc;
+    var token, outputPath, npmrc;
     return tslib_1.__generator(this, function (_a) {
       switch (_a.label) {
         case 0:
+          token = getNpmToken(options);
           return [4, getOutputPath(context)];
         case 1:
           outputPath = _a.sent();
-          npmrc = generateNpmrc();
+          npmrc = generateNpmrc(token);
           return [4, spawn_process_1.spawnProcess('rm', ['-f', '.npmrc'], { cwd: outputPath }).toPromise()];
         case 2:
           _a.sent();
@@ -74,6 +75,17 @@ function getOutputPath(context) {
     });
   });
 }
-function generateNpmrc() {
-  return '\nregistry=http://registry.npmjs.org/\n@midguard:registry=https://registry.npmjs.org/\n'.trim();
+function getNpmToken(options) {
+  var token = options.npmToken || process.env.NPM_TOKEN;
+  if (!token) {
+    throw new Error('npmToken was not provided as an arg nor is it present in env.');
+  }
+  return token;
+}
+function generateNpmrc(npmToken) {
+  return (
+    '\nregistry=http://registry.npmjs.org/\n//registry.npmjs.org/:_authToken=' +
+    npmToken +
+    '\n@midguard:registry=https://registry.npmjs.org/\n'
+  ).trim();
 }

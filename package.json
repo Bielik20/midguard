@@ -2,6 +2,10 @@
   "name": "midguard",
   "version": "0.0.0-development",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bielik20/midguard.git"
+  },
   "scripts": {
     "nx": "nx",
     "start": "nx serve",
@@ -66,9 +70,5 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Bielik20/midguard.git"
   }
 }
