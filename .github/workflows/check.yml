@@ -3,8 +3,9 @@ on:
   push:
     branches-ignore:
       - master
+      - testing
       - develop
-      - 'beta/*'
+      - 'develop/*'
 
 
 jobs:
@@ -21,9 +22,8 @@ jobs:
           path: node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+            node_modules-${{ runner.os }}-
+            node_modules-
       - name: Setup Node.js
         if: steps.cache.outputs.cache-hit != 'true'
         uses: actions/setup-node@v1

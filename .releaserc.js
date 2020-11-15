@@ -16,8 +16,8 @@ module.exports = {
   ],
   branches: [
     { name: 'master' },
-    { name: 'beta/*', prerelease: '${name.replace(/^beta\\//g, "")}' },
-    { name: 'develop', prerelease: 'dev' },
     { name: 'testing', prerelease: 'rc' },
+    { name: 'develop', prerelease: 'beta' },
+    { name: 'develop/*', prerelease: 'alpha-${name.replace(/^develop\\//g, "")}' },
   ],
 };
