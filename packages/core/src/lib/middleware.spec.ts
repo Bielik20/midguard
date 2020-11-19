@@ -3,12 +3,12 @@ import { Middleware, MiddlewareNext, middleware } from './middleware';
 describe('Middleware', () => {
   it('should work for simple string', () => {
     const foo: Middleware<any, any, any, any> = (input, next) => {
-      const output = next(input + 'Foo');
+      const output = next({ input: input.input + 'Foo' });
 
       return output + 'Foo';
     };
     const bar: Middleware<any, any, any, any> = (input, next) => {
-      const output = next(input + 'Bar');
+      const output = next({ input: input.input + 'Bar' });
 
       return output + 'Bar';
     };
@@ -16,10 +16,10 @@ describe('Middleware', () => {
     const fooBar = middleware(foo, bar);
 
     const result = middleware(middleware(), fooBar, (input) => {
-      expect(input).toEqual('startFooBar');
+      expect(input).toEqual({ input: 'startFooBar' });
 
       return 'end';
-    })('start');
+    })({ input: 'start' });
 
     expect(result).toEqual('endBarFoo');
   });
@@ -76,7 +76,7 @@ describe('Middleware', () => {
     }
 
     const handler: MiddlewareNext<FooInputAdd, BarOutput> = (input) => {
-      console.log(input.foo);
+      console.log(input);
       return { end: 'end' };
     };
 
@@ -84,6 +84,7 @@ describe('Middleware', () => {
     const combinedFooBar = middleware(foo(), bar());
     const combinedBarNoop = middleware(foo(), noop(), bar());
     const combinedBarNoop2 = middleware(noop(), foo(), bar());
+    const combinedBarNoop3 = middleware(foo(), bar(), noop());
     const fooImp = foo();
     const barImp = bar();
     const combinedFooBarImp = middleware(fooImp, barImp);
