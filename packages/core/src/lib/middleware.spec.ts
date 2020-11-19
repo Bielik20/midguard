@@ -1,13 +1,13 @@
-import { MiddlewareFunction, MiddlewareNext, middleware } from './middleware';
+import { Middleware, MiddlewareNext, middleware } from './middleware';
 
 describe('Middleware', () => {
   it('should work for simple string', () => {
-    const foo: MiddlewareFunction<any, any, any, any> = (input, next) => {
+    const foo: Middleware<any, any, any, any> = (input, next) => {
       const output = next(input + 'Foo');
 
       return output + 'Foo';
     };
-    const bar: MiddlewareFunction<any, any, any, any> = (input, next) => {
+    const bar: Middleware<any, any, any, any> = (input, next) => {
       const output = next(input + 'Bar');
 
       return output + 'Bar';
@@ -28,23 +28,19 @@ describe('Middleware', () => {
     type FooInput = {
       start: string;
     };
-    type FooInputMod = {
+    type FooInputAdd = {
       foo: string;
     };
     type FooOutput = {
       end: string;
     };
     type FooOutputMod = {
+      end: string;
       foo: string;
     };
-    function foo<TInput extends FooInput, TOutput extends FooOutput>(): MiddlewareFunction<
-      TInput,
-      TInput & FooInputMod,
-      TOutput,
-      TOutput & FooOutputMod
-    > {
+    function foo(): Middleware<FooInput, FooInputAdd, FooOutput, FooOutputMod> {
       return (input, next) => {
-        const output = next({ ...input, foo: 'foo' });
+        const output = next({ foo: 'foo' });
 
         return { ...output, foo: 'foo' };
       };
@@ -53,42 +49,47 @@ describe('Middleware', () => {
     type BarInput = {
       start: string;
     };
-    type BarInputMod = {
+    type BarInputAdd = {
       bar: string;
     };
     type BarOutput = {
       end: string;
     };
     type BarOutputMod = {
+      end: string;
       bar: string;
     };
-    function bar<TInput extends BarInput, TOutput extends BarOutput>(): MiddlewareFunction<
-      TInput,
-      TInput & BarInputMod,
-      TOutput,
-      TOutput & BarOutputMod
-    > {
+    function bar(): Middleware<BarInput, BarInputAdd, BarOutput, BarOutputMod> {
       return (input, next) => {
-        const output = next({ ...input, bar: 'bar' });
+        const output = next({ bar: 'bar' });
 
         return { ...output, bar: 'bar' };
       };
     }
 
-    const handler: MiddlewareNext<FooInputMod, BarOutput> = (input) => {
+    function noop(): Middleware<unknown, unknown> {
+      return (input, next) => {
+        const output = next({});
+
+        return { noop: 'noop' };
+      };
+    }
+
+    const handler: MiddlewareNext<FooInputAdd, BarOutput> = (input) => {
       console.log(input.foo);
       return { end: 'end' };
     };
 
     const combinedFooBar = middleware(foo(), bar());
+    const combinedBarNoop = middleware(noop(), bar());
     const fooImp = foo();
     const barImp = bar();
     const combinedFooBarImp = middleware(fooImp, barImp);
     const okish = middleware(foo(), bar(), handler);
-    // const notOkCall = middleware(foo(), bar(), handler)({ start: 'ss' });
-    // const notOk = middleware(foo(), bar(), (input) => {
-    //   console.log(input.foo);
-    //   return { end: 'end' };
-    // });
+    const notOkCall = middleware(foo(), bar(), handler)({ start: 'ss' });
+    const notOk = middleware(foo(), bar(), (input) => {
+      console.log(input.foo);
+      return { end: 'end' };
+    });
   });
 });
