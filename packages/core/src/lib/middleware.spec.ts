@@ -38,7 +38,7 @@ describe('Middleware', () => {
       end: string;
       foo: string;
     };
-    function foo(): Middleware<FooInput, FooInputAdd, FooOutput, FooOutputMod> {
+    function foo<TIn extends FooInput>(): Middleware<TIn, FooInputAdd, FooOutput, FooOutputMod> {
       return (input, next) => {
         const output = next({ foo: 'foo' });
 
@@ -59,7 +59,7 @@ describe('Middleware', () => {
       end: string;
       bar: string;
     };
-    function bar(): Middleware<BarInput, BarInputAdd, BarOutput, BarOutputMod> {
+    function bar<TIn extends BarInput>(): Middleware<TIn, BarInputAdd, BarOutput, BarOutputMod> {
       return (input, next) => {
         const output = next({ bar: 'bar' });
 
@@ -67,11 +67,11 @@ describe('Middleware', () => {
       };
     }
 
-    function noop(): Middleware<unknown, unknown> {
+    function noop<TIn, TOut>(): Middleware<TIn, void, TOut> {
       return (input, next) => {
-        const output = next({});
+        const output = next();
 
-        return { noop: 'noop' };
+        return output;
       };
     }
 
@@ -80,8 +80,10 @@ describe('Middleware', () => {
       return { end: 'end' };
     };
 
+    // Middleware<FooInput, FooInput & FooInputAdd & void & BarInputAdd, BarOutput, FooOutputMod>
     const combinedFooBar = middleware(foo(), bar());
-    const combinedBarNoop = middleware(noop(), bar());
+    const combinedBarNoop = middleware(foo(), noop(), bar());
+    const combinedBarNoop2 = middleware(noop(), foo(), bar());
     const fooImp = foo();
     const barImp = bar();
     const combinedFooBarImp = middleware(fooImp, barImp);
@@ -93,3 +95,11 @@ describe('Middleware', () => {
     });
   });
 });
+
+type A = { veryString: 'strict' };
+
+type B = A extends undefined ? 'yes' : 'no';
+
+type C = undefined & A;
+
+type D = unknown & A;
